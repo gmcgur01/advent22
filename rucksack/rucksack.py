@@ -2,32 +2,51 @@
 
 import sys
 
+class Group:
+    def __init__(self, sacks):
+        self.sacks = sacks
+
+    def find_badge(self):
+        for item in self.sacks[0]: 
+            if item in self.sacks[1] and item in self.sacks[2]: 
+                return item
+        raise Exception("No common item found")
+
 def main():
 
     if len(sys.argv) != 2:
         sys.exit(f"Usage: {sys.argv[0]} <file name>")
 
-    priority_total = 0
+    rucksacks = []
 
     try:
         with open(sys.argv[1]) as file:
             for line in file:
-                priority_total += get_priority(find_dupe(line))
+                rucksacks.append(line.strip())
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-    print (priority_total)
+
+    groups = []
+
+    for i in range(len(rucksacks)):
+        if i % 3 == 0: 
+            curr_group = Group([])
+            groups.append(curr_group)
+        curr_group.sacks.append(rucksacks[i])
+
+    priority_total = 0
+
+    for group in groups:
+        priority_total += get_priority(group.find_badge())
+
+    print(priority_total)
+
 
 def get_priority(item):
     if item.islower(): return ord(item) - 96
     if item.isupper(): return ord(item) - 38
     raise ValueError("invalid item")
-
-def find_dupe(rucksack):
-    for item in rucksack[0:int(len(rucksack)/2)]:
-        if item in rucksack[int(len(rucksack)/2):]:
-            return item
-    raise Exception("No duplicate found")
 
 if __name__ == "__main__":
     main()
