@@ -14,6 +14,12 @@ class Elf:
         for calorie in self.calories:
             ret = ret + str(calorie) + " "
         return ret
+
+    def __eq__(self, other):
+        return self.calories == other.calories
+
+    def __ne__(self, other):
+        return not self == other
     
 def get_total(elf):
         return sum(elf.calories)
@@ -42,10 +48,18 @@ def main():
 
     elves.append(curr_elf)
 
-    max_elf = max(elves, key=get_total)
+    max_elves = []
 
-    print (get_total(max_elf))
+    for _ in range(3):
+        max_elf = max(elves, key=get_total)
+        max_elves.append(max_elf)
+        elves.remove(max_elf)
 
+    total = 0
+    for elf in max_elves:
+        total += get_total(elf)
+
+    print(total)
 
 if __name__ == "__main__":
     main()
