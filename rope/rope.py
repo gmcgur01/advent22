@@ -12,7 +12,7 @@ class Move:
     num_steps: int
 
 
-class Rope_end:
+class Rope_segment:
     curr_poss: Coordinate
     visited_coords: set
 
@@ -23,7 +23,7 @@ class Rope_end:
         
 
     def in_range(self, other):
-        if not isinstance(other, Rope_end):
+        if not isinstance(other, Rope_segment):
             raise ValueError("Parameter for in_range must be a rope end")
         if abs(self.curr_pos.x - other.curr_pos.x) > 1:
             return False
@@ -57,7 +57,7 @@ class Rope_end:
             self.visited_coords.add(self.curr_pos)
 
     def follow(self, other):
-        if not isinstance(other, Rope_end):
+        if not isinstance(other, Rope_segment):
             raise ValueError("Parameter for in_range must be a rope end")
         x_diff = other.curr_pos.x - self.curr_pos.x
         y_diff = other.curr_pos.y - self.curr_pos.y
@@ -102,19 +102,21 @@ def main():
         direction, num_steps = line.strip().split(" ")
 
         moves.append(Move(direction, int(num_steps)))
+    
+    file.close()
 
-    head = Rope_end()
-    tail = Rope_end()
+    rope = [Rope_segment() for _ in range(10)]
 
     for move in moves:
         steps = move.num_steps
         while steps > 0:
-            head.move(move.direction)
-            if not tail.in_range(head):
-                tail.follow(head)
+            rope[0].move(move.direction)
+            for i in range(1, 10):
+                if not rope[i].in_range(rope[i - 1]):
+                    rope[i].follow(rope[i - 1])
             steps -= 1
 
-    print (len(tail.visited_coords))
+    print (len(rope[9].visited_coords))
 
 if __name__ == "__main__":
     main()
