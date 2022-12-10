@@ -13,23 +13,19 @@ def play_turn(other_move, my_move):
     points = 0
     match my_move:
         case "X":
-            points += 1
-            if other_move == "A":
-                points += 3
-            elif other_move == "C":
-                points += 6
+            if other_move == "A": points += 3
+            if other_move == "B": points += 1
+            if other_move == "C": points += 2
         case "Y":
-            points += 2
-            if other_move == "B":
-                points += 3
-            elif other_move == "A":
-                points += 6
-        case "Z":
             points += 3
-            if other_move == "C":
-                points += 3
-            elif other_move == "B":
-                points += 6
+            if other_move == "A": points += 1
+            if other_move == "B": points += 2
+            if other_move == "C": points += 3
+        case "Z":
+            points += 6
+            if other_move == "A": points += 2
+            if other_move == "B": points += 3
+            if other_move == "C": points += 1
         case _:
             raise ValueError("Invalid Move")
 
