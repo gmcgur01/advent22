@@ -44,15 +44,18 @@ def main():
         curr_value += op.num
     value_list.append(curr_value)
             
-    key_cycles = [20, 60, 100, 140, 180, 220]
+    screen = [[" " for _ in range(40)] for _ in range(6)]
 
-    signal_strength = 0
-    for cycle in key_cycles:
-        signal_strength += cycle * value_list[cycle - 1]
+    for row_num in range(6):
+        for col_num in range(40):
+            pixel_num = 40 * row_num + col_num
+            if abs((pixel_num % 40) - value_list[pixel_num]) <= 1:
+                screen[row_num][col_num] = "#"
 
-    print (signal_strength)
+    for row in screen:
+        for pixel in row:
+            print(pixel, end="")
+        print("")
     
-
-
 if __name__ == "__main__":
     main()
