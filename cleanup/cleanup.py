@@ -14,9 +14,9 @@ class Pair:
     elf2: Interval
     
     def is_overlap(self):
-        if self.elf1.start <= self.elf2.start and self.elf1.end >= self.elf2.end:
+        if self.elf1.start >= self.elf2.start and self.elf1.start <= self.elf2.end:
             return True
-        if self.elf2.start <= self.elf1.start and self.elf2.end >= self.elf1.end:
+        if self.elf2.start >= self.elf1.start and self.elf2.start <= self.elf1.end:
             return True
         return False
 
@@ -41,7 +41,7 @@ def main():
 
     overlap_total = 0
     for pair in pairs:
-        overlap_total += pair.is_overlap()
+        if pair.is_overlap(): overlap_total += 1
 
     print(overlap_total)
 
