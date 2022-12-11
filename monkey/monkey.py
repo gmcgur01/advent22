@@ -80,13 +80,19 @@ def main():
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-    for _ in range(20):
+    lcd = monkeys[0].test
 
+    for i in range(1, len(monkeys)):
+        if lcd % monkeys[i].test != 0: lcd *= monkeys[i].test
+
+    for i in range(10000):
+        if i % 100 == 0: print(i)
         for monkey in monkeys:
-            while len(monkey.items) != 0:
+            num_items = len(monkey.items)
+            for _ in range(num_items):
                 curr_item = monkey.items.popleft()
                 curr_item = monkey.op.perform_op(curr_item)
-                curr_item = int (curr_item / 3)
+                curr_item = curr_item % lcd
                 if curr_item % monkey.test == 0:
                     monkeys[monkey.true_case].items.append(curr_item)
                 else:
