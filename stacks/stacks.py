@@ -41,10 +41,15 @@ def main():
             if line[(4 * i) + 1] != " ":
                 stacks[i].append(line[(4 * i) + 1])
 
+    move_stack = []
+
     for instruction in instructions:
         instr = instruction.strip().split(" ")
         for _ in range(int(instr[1])):
             box = stacks[int(instr[3]) - 1].pop()
+            move_stack.append(box)
+        while len(move_stack) != 0:
+            box = move_stack.pop()
             stacks[int(instr[5]) - 1].append(box)
 
     for stack in stacks:
