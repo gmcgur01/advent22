@@ -35,7 +35,11 @@ def main():
                 curr_dir.files.append(int(comp[0]))
 
     calculate_size(root)
-    print (calculate_sum(root))
+
+    unused_space = 70000000 - root.size
+    space_to_free = 30000000 - unused_space
+
+    print (find_smallest(root, space_to_free).size)
 
 
 @dataclass
@@ -60,6 +64,15 @@ def calculate_sum(dir):
         sum += calculate_sum(subdir)
     return sum
         
+def find_smallest(dir, size):
+    ret = None
+    if dir.size > size:
+        ret = dir
+    for subdir in dir.subdirectories.values():
+        result = find_smallest(subdir, size)
+        if result != None and result.size < ret.size:
+            ret = result
+    return ret
 
 if __name__ == "__main__":
     main()
