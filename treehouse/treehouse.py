@@ -22,6 +22,35 @@ def main():
     grid_height = len(grid)
     grid_width = len(grid[0])
 
+    max_score = -1
+
+    for row_num in range(grid_height):
+        for col_num in range(grid_width):
+            scenic_score = 1
+            scenic_score *= scenic_left(grid, grid[row_num][col_num].height, row_num, col_num)
+            scenic_score *= scenic_right(grid, grid[row_num][col_num].height, row_num, col_num)
+            scenic_score *= scenic_up(grid, grid[row_num][col_num].height, row_num, col_num)
+            scenic_score *= scenic_down(grid, grid[row_num][col_num].height, row_num, col_num)
+            if scenic_score > max_score:
+                max_score = scenic_score
+    
+    print (max_score)
+
+
+@dataclass(frozen=True)
+class Tree:
+    height: int
+    row_num: int
+    col_num: int
+
+    def __str__(self):
+        return str(self.height)
+
+def get_visible(grid):
+
+    grid_height = len(grid)
+    grid_width = len(grid[0])
+
     visible_trees = set()
 
     for row_num in range(grid_height):
@@ -51,17 +80,67 @@ def main():
                 if grid[grid_height - row_num - 1][col_num] not in visible_trees:
                     visible_trees.add(grid[grid_height - row_num - 1][col_num])
 
-    print(len(visible_trees))
+    return len(visible_trees)
 
-@dataclass(frozen=True)
-class Tree:
-    height: int
-    row_num: int
-    col_num: int
+def scenic_left(grid, height, row_num, col_num):
+    scenic_score = 0
+    if col_num == 0:
+        return scenic_score
+    col_num -= 1
+    curr_tree = grid[row_num][col_num]
+    scenic_score += 1
+    while curr_tree.height < height:
+        col_num -= 1
+        if col_num < 0:
+            break
+        curr_tree = grid[row_num][col_num]
+        scenic_score += 1
+    return scenic_score
 
-    def __str__(self):
-        return str(self.height)
+def scenic_right(grid, height, row_num, col_num):
+    scenic_score = 0
+    if col_num == len(grid[0]) - 1:
+        return scenic_score
+    col_num += 1
+    curr_tree = grid[row_num][col_num]
+    scenic_score += 1
+    while curr_tree.height < height:
+        col_num += 1
+        if col_num >= len(grid[0]):
+            break
+        curr_tree = grid[row_num][col_num]
+        scenic_score += 1
+    return scenic_score
 
+def scenic_up(grid, height, row_num, col_num):
+    scenic_score = 0
+    if row_num == 0:
+        return scenic_score
+    row_num -= 1
+    curr_tree = grid[row_num][col_num]
+    scenic_score += 1
+    while curr_tree.height < height:
+        row_num -= 1
+        if row_num < 0:
+            break
+        curr_tree = grid[row_num][col_num]
+        scenic_score += 1
+    return scenic_score
+
+def scenic_down(grid, height, row_num, col_num):
+    scenic_score = 0
+    if row_num == len(grid) - 1:
+        return scenic_score
+    row_num += 1
+    curr_tree = grid[row_num][col_num]
+    scenic_score += 1
+    while curr_tree.height < height:
+        row_num += 1
+        if row_num >= len(grid):
+            break
+        curr_tree = grid[row_num][col_num]
+        scenic_score += 1
+    return scenic_score
 
 if __name__ == "__main__":
     main()
