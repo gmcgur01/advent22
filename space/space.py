@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+
 import sys
 from dataclasses import dataclass
 
@@ -15,38 +16,49 @@ def main():
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-    root = Directory(0, [], {}, None)
+    root = Directory("/", 0, [], {}, None)
 
     for line in terminal_output:
-        components = line.split(" ")
-        if components[0] == "$":
-            if components[1] == "cd":
-                if components[2] == "..":
+        comp = line.split(" ")
+        if comp[0] == "$":
+            if comp[1] == "cd":
+                if comp[2] == "..":
                     curr_dir = curr_dir.parent
-                elif components[2] == "/":
+                elif comp[2] == "/":
                     curr_dir = root
                 else:
-                    curr_dir = curr_dir.subdirectories[components[2]]
+                    curr_dir = curr_dir.subdirectories[comp[2]]
         else:
-            if components[0] == "dir":
-                curr_dir.subdirectories[components[1]] = Directory(0, [], {}, curr_dir)
+            if comp[0] == "dir":
+                curr_dir.subdirectories[comp[1]] = Directory(comp[1], 0, [], {}, curr_dir)
             else:
-                curr_dir.files.append(int(components[0]))
+                curr_dir.files.append(int(comp[0]))
 
-    print(root)
     calculate_size(root)
+    print (calculate_sum(root))
+
 
 @dataclass
 class Directory:
+    name: str
     total_size: int
-    files: list
+    files: list[int]
     subdirectories: dict
     parent: any
 
 def calculate_size(dir):
     dir.size = sum(dir.files)
-    for subdir in dir.subdirectories:
-        dir.size += calculate_size(subdir)
+    for subdir in dir.subdirectories.values():
+        calculate_size(subdir)
+        dir.size += subdir.size
+
+def calculate_sum(dir):
+    sum = 0
+    if dir.size <= 100000:
+        sum += dir.size
+    for subdir in dir.subdirectories.values():
+        sum += calculate_sum(subdir)
+    return sum
         
 
 if __name__ == "__main__":
