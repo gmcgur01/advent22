@@ -8,25 +8,29 @@ def main():
 
     packets = []
     curr_pair = []
+    packets.append(curr_pair)
 
     try:
         with open(sys.argv[1]) as file:
-
             for line in file:
                 line = line.strip()
                 if line == "":
-                    packets.append(curr_pair)
                     curr_pair = []
+                    packets.append(curr_pair)
                 else:
                     curr_pair.append(str_to_list(line))
 
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-    for pair in packets:
-        print(pair[0])
-    
-    print("hello world")
+    total = 0
+    for i in range(len(packets)):
+        result = compare_pairs(packets[i][0], packets[i][1])
+        if result == True or result == None:
+            total += i + 1
+
+    print(total)
+
 
 def str_to_list(line):
     list_levels = []
@@ -56,6 +60,31 @@ def str_to_list(line):
             continue
         i += 1
     return ret
+
+def compare_pairs(left, right):
+    i = 0
+    while True:
+        if i == len(left) and i == len(right):
+            return None
+        if i == len(left) or i == len(right):
+            return len(left) <= len(right)            
+        elif isinstance(left[i], list) and isinstance(right[i], list):
+            result = compare_pairs(left[i], right[i])
+            if result != None:
+                return result
+        elif isinstance(left[i], list):
+            result = compare_pairs(left[i], [right[i]])
+            if result != None:
+                return result
+        elif isinstance(right[i], list):
+            result = compare_pairs([left[i]], right[i])
+            if result != None:
+                return result
+        else:
+            if right[i] > left[i]: return True
+            if right[i] < left[i]: return False
+        i += 1
+            
 
 if __name__ == "__main__":
     main()
