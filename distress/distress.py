@@ -7,30 +7,77 @@ def main():
         sys.exit(f"Usage: {sys.argv[0]} <file name>")
 
     packets = []
-    curr_pair = []
-    packets.append(curr_pair)
 
     try:
         with open(sys.argv[1]) as file:
             for line in file:
                 line = line.strip()
-                if line == "":
-                    curr_pair = []
-                    packets.append(curr_pair)
-                else:
-                    curr_pair.append(str_to_list(line))
+                if line != "":
+                    packets.append(Packet(line))
 
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-    total = 0
-    for i in range(len(packets)):
-        result = compare_pairs(packets[i][0], packets[i][1])
-        if result == True or result == None:
-            total += i + 1
+    div1 = Packet([[2]])
+    div2 = Packet([[6]])
 
-    print(total)
+    packets.append(div1)
+    packets.append(div2)
+    packets.sort()
 
+    decoder_key = (packets.index(div1) + 1) * (packets.index(div2) + 1)
+    print(decoder_key)
+
+class Packet:
+    
+    def __init__(self, data):
+        if isinstance(data, str):
+            self.data = str_to_list(data)
+        else:
+            self.data = data
+    def __eq__(self, other):
+        return compare_pairs(self.data, other.data) == None
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __lt__(self, other):
+        return compare_pairs(self.data, other.data) == True
+
+    def __rt__(self, other):
+        return compare_pairs(self.data, other.data) == False
+
+    def __ge__(self, other):
+        result = compare_pairs(self.data, other.data)
+        return result == False or result == None
+
+    def __le__(self, other):
+        result = compare_pairs(self.data, other.data)
+        return result == True or result == None
+
+def compare_pairs(left, right):
+    i = 0
+    while True:
+        if i == len(left) and i == len(right):
+            return None
+        if i == len(left) or i == len(right):
+            return len(left) <= len(right)            
+        elif isinstance(left[i], list) and isinstance(right[i], list):
+            result = compare_pairs(left[i], right[i])
+            if result != None:
+                return result
+        elif isinstance(left[i], list):
+            result = compare_pairs(left[i], [right[i]])
+            if result != None:
+                return result
+        elif isinstance(right[i], list):
+            result = compare_pairs([left[i]], right[i])
+            if result != None:
+                return result
+        else:
+            if right[i] > left[i]: return True
+            if right[i] < left[i]: return False
+        i += 1
 
 def str_to_list(line):
     list_levels = []
@@ -60,31 +107,6 @@ def str_to_list(line):
             continue
         i += 1
     return ret
-
-def compare_pairs(left, right):
-    i = 0
-    while True:
-        if i == len(left) and i == len(right):
-            return None
-        if i == len(left) or i == len(right):
-            return len(left) <= len(right)            
-        elif isinstance(left[i], list) and isinstance(right[i], list):
-            result = compare_pairs(left[i], right[i])
-            if result != None:
-                return result
-        elif isinstance(left[i], list):
-            result = compare_pairs(left[i], [right[i]])
-            if result != None:
-                return result
-        elif isinstance(right[i], list):
-            result = compare_pairs([left[i]], right[i])
-            if result != None:
-                return result
-        else:
-            if right[i] > left[i]: return True
-            if right[i] < left[i]: return False
-        i += 1
-            
 
 if __name__ == "__main__":
     main()
