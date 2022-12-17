@@ -16,26 +16,23 @@ def main():
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-
-    min_x = min(rock_paths[0], key=get_x).x
-    max_x = max(rock_paths[0], key=get_x).x
     max_y = max(rock_paths[0], key=get_y).y
 
     for path in rock_paths:
-        x = min(path, key=get_x).x
-        if x < min_x: min_x = x
-        x = max(path, key=get_x).x
-        if x > max_x: max_x = x
         y = max(path, key=get_y).y
         if y > max_y: max_y = y
 
-    cave_width = max_x - min_x
+    cave_width = (2 * (max_y + 2)) + 1
 
-    cave = [[0 for _ in range(cave_width + 1)] for _ in range(max_y + 1)]
+    min_x = 500 - (max_y + 3)
+
+    cave = [[0 for _ in range(cave_width + 1)] for _ in range(max_y + 3)]
+
+    rock_paths.append([Position(min_x, max_y + 2), Position(min_x + cave_width, max_y + 2)])
 
     draw_paths(cave, rock_paths, min_x)
 
-    print(drop_sand(cave, min_x) - 1)
+    print(drop_sand(cave, min_x))
 
 @dataclass
 class Position:
@@ -98,6 +95,8 @@ def drop_sand(cave, min_x):
     can_move = False
     while in_bounds: 
         if not can_move:
+            if cave[0][500 - min_x] == 1:
+                return units
             sand = Position(500 - min_x, 0)
             can_move = True
             units += 1
