@@ -19,25 +19,17 @@ def main():
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-    left = min(sensors, key=far_left)
-    right = max(sensors, key=far_right)
 
-
-    total = 0
-    for i in range(left.sensor.x - left.distance, (right.sensor.x + right.distance) + 1):
-        curr_pos = Position(i, 2_000_000)
-        is_beacon = False
-        for sensor in sensors:
-            if curr_pos == sensor.beacon:
-                is_beacon = True
-        if not is_beacon:
+    for i in range(4000001):
+        print(i)
+        for j in range(4000001):
+            in_range = False
             for sensor in sensors:
-                if sensor.in_range(curr_pos):
-                    total += 1
+                if sensor.in_range(j, i):
+                    in_range = True
                     break
-
-    print(total)
-
+            if not in_range:
+                print(j * 4000000 + i)
 
 def parse_line(line):
     if matches := re.search(r"Sensor at x=(-*\d+), y=(-*\d+): closest beacon is at x=(-*\d+), y=(-*\d+)", line):
@@ -59,8 +51,8 @@ class Sensor:
     def __str__(self):
         return "(" + str(self.sensor) + ", " + str(self.beacon) + ", " + str(self.distance) + ")"
 
-    def in_range(self, pos):
-        return abs(self.sensor.x - pos.x) + abs(self.sensor.y - pos.y) <= self.distance
+    def in_range(self, x, y):
+        return abs(self.sensor.x - x) + abs(self.sensor.y - y) <= self.distance
 
 def far_left(sensor):
     return sensor.sensor.x - sensor.distance
