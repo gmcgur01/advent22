@@ -29,7 +29,7 @@ def main():
                     in_range = True
                     break
             if not in_range:
-                print(j * 4000000 + i)
+                print(j * 4000000 + i)=
 
 def parse_line(line):
     if matches := re.search(r"Sensor at x=(-*\d+), y=(-*\d+): closest beacon is at x=(-*\d+), y=(-*\d+)", line):
@@ -59,6 +59,59 @@ def far_left(sensor):
 
 def far_right(sensor):
     return sensor.sensor.x + sensor.distance
+
+class Interval:
+    def __init__(self, start=None, end=None):
+        
+        self.start = start
+        self.end = end
+        self.left_node = None
+        self.right_node = None
+
+    def add_sensor(self, sensor, y_pos):
+        range = sensor.distance - abs(y_pos - sensor.sensor.y)
+        if range < 0:
+            return
+
+        start = sensor.sensor.x - range
+        end = sensor.sensor.x + range
+
+        if self.start == None and self.end == None:
+            self.start = start
+            self.start = end
+
+        if start < self.end and end > self.start:
+            if start < self.start:
+                self.start = start
+            if end > self.end:
+                self.end = end
+            return
+        
+        if end < self.start:
+            if self.left_node != None:
+                self.left_node.add_sensor(sensor, y_pos)
+            else:
+                self.left_node = Interval(start, end)
+            return
+
+        if start > self.end:
+            if self.left_node != None:
+                self.left_node.add_sensor(sensor, y_pos)
+            else:
+                self.left_node = Interval(start, end)
+            return
+        
+    def check_children(self, parent):
+        if self.left_node != None:
+            self.left_node.check_children(parent)
+            self.left_node = None
+        if self.right_node != None:
+            curr_node = self.right_node
+            self.right_node = None
+            curr_node.check_children(parent)
+            
+        parent.add_sensor(self.start)
+
 
 if __name__ == "__main__":
     main()
