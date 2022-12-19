@@ -3,13 +3,15 @@ import sys
 import re
 from dataclasses import dataclass
 from collections import deque
-from itertools import permutations
+from functools import cache
+
+valves = []
+working_valves = []
+grid = []
 
 def main():
     if len(sys.argv) != 2:
         sys.exit(f"Usage: {sys.argv[0]} <file name>")
-
-    valves = []
 
     try:
         with open(sys.argv[1]) as file:
@@ -20,18 +22,19 @@ def main():
     
     link_valves(valves)
 
-    paths = shortest_path(valves)
-
-    working_valves = []
-    start = None
+    shortest_path(valves)
+    
+    start = 0
 
     for valve in valves:
         if valve.name == "AA":
-            start = valve
+            start = valves.index(valve)
         if valve.flow != 0:
             working_valves.append(valve)
 
-    print(max_flow(valves, working_valves, paths, start))
+    ret = max_flow(start, 30, 0)
+
+    print(ret)
 
 def parse_line(line):
     if matches := re.findall(r"([A-Z][A-Z]|(?:\d+))", line):
@@ -47,7 +50,8 @@ def link_valves(valves):
 
 def shortest_path(valves):
 
-    grid = [[0 for _ in range(len(valves))] for _ in range(len(valves))]
+    for _ in range(len(valves)):
+        grid.append([0 for _ in range(len(valves))])
     
     for valve in valves:
         queue = deque()
@@ -62,30 +66,20 @@ def shortest_path(valves):
                 if neighbor.name not in seen:
                     queue.append((neighbor, steps + 1))
                     seen.add(neighbor.name)
-    
-    return grid
         
-def max_flow(valves, working_valves, grid, start):
-    
-    perms = permutations(working_valves)
-    max_flow = 0
-    count = 0
-    for perm in perms:
-        count += 1
-        if not count % 1000000: print (count)
-        curr_valve = start
-        time = 30
-        total = 0
-        for valve in perm:
-            time_spent = grid[valves.index(curr_valve)][valves.index(valve)] + 1
-            time -= time_spent
-            if time < 0:
-                break
-            total += valve.flow * time
-            curr_valve = valve
-        if total > max_flow:
-            max_flow = total
-    return max_flow
+@cache
+def max_flow(curr_index, time, visited):
+    if time <= 0:
+        return 0
+    max = 0
+    for i in range(len(working_valves)):
+        if (1 << i) & visited == 0:
+            next_index = valves.index(working_valves[i])
+            new_time = time - (grid[curr_index][next_index] + 1)
+            new_visited = visited | (1 << i)
+            ret = max_flow(next_index, new_time, new_visited)
+            if ret > max: max = ret
+    return (valves[curr_index].flow * time) + max
 
 @dataclass
 class Valve:
