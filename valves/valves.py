@@ -32,9 +32,7 @@ def main():
         if valve.flow != 0:
             working_valves.append(valve)
 
-    ret = max_flow(start, 30, 0)
-
-    print(ret)
+    print(split_list(start))
 
 def parse_line(line):
     if matches := re.findall(r"([A-Z][A-Z]|(?:\d+))", line):
@@ -68,24 +66,42 @@ def shortest_path(valves):
                     seen.add(neighbor.name)
         
 @cache
-def max_flow(curr_index, time, visited):
+def max_flow(curr_index, time, visited, working):
     if time <= 0:
         return 0
     max = 0
-    for i in range(len(working_valves)):
+    for i in range(len(working)):
         if (1 << i) & visited == 0:
-            next_index = valves.index(working_valves[i])
+            next_index = working[i]
             new_time = time - (grid[curr_index][next_index] + 1)
             new_visited = visited | (1 << i)
-            ret = max_flow(next_index, new_time, new_visited)
+            ret = max_flow(next_index, new_time, new_visited, working)
             if ret > max: max = ret
     return (valves[curr_index].flow * time) + max
+
+def split_list(start):
+    max = 0
+    for i in range(1 << len(working_valves)):
+        group1 = []
+        group2 = []
+        for j in range(len(working_valves)):
+            if (1 << j) & i == 0:
+                group1.append(valves.index(working_valves[j]))
+            else:
+                group2.append(valves.index(working_valves[j]))
+        val = max_flow(start, 26, 0, tuple(group1)) + max_flow(start, 26, 0, tuple(group2))
+        if val > max:
+            max = val
+    return max
 
 @dataclass
 class Valve:
     name: str
     flow: int
     neighbors: list
+
+    def __repr__(self):
+        return self.name
 
     def __str__(self):
         ret = f"Name: {self.name}, Flow: {self.flow}, Neighbors: "
