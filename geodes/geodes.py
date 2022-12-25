@@ -10,16 +10,16 @@ def main():
 
     try:
         with open(sys.argv[1]) as file:
-            blueprints = [parse_line(line.rstrip()) for line in file]
+            blueprints = [parse_line(file.readline().rstrip()) for _ in range(3)]                
     except FileNotFoundError:
         sys.exit(f"{sys.argv[1]}: Unable to open file")
 
-    quality_total = 0
-    for i, blueprint in enumerate(blueprints):
-        quality_total += (i + 1) * max_geodes(blueprint)
+    total = 1
+    for blueprint in blueprints:
+        total *= max_geodes(blueprint)
 
-    print(quality_total)
-        
+    print(total)
+    return        
 
 def parse_line(line):
     if matches := re.findall(r"(-?\d+)", line):
@@ -36,8 +36,7 @@ class Blueprint:
     geode_obsidian_cost: int
 
 def max_geodes(blueprint):
-    result = mine(24, blueprint, (0, 0, 0, 0), (1, 0, 0, 0), 0)
-    print(result)
+    result = mine(32, blueprint, (0, 0, 0, 0), (1, 0, 0, 0), 0)
     return result 
 
 # for mats and robots:
