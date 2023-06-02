@@ -34,8 +34,6 @@ def main():
                 print((farthest_right + 1) * 4000000 + i)
                 return
 
-
-
 def parse_line(line):
     if matches := re.search(r"Sensor at x=(-*\d+), y=(-*\d+): closest beacon is at x=(-*\d+), y=(-*\d+)", line):
         sensor_x = int(matches.group(1))
